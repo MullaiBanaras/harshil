@@ -28,19 +28,10 @@ connectDB();
 //  Order matters — security first, then parsing
 // ════════════════════════════════════════════════════
 
-// 1. Security headers
+// 1. Security headers — CSP disabled to allow admin dashboard CDN scripts
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://www.google-analytics.com"],
-    },
-  },
+  contentSecurityPolicy: false,
 }));
 
 // 2. GZIP compression — reduces response size by ~70%
