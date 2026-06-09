@@ -304,21 +304,35 @@
 
 <script>
 // ─────────────────────────────────────────────────────
-//  CONFIG — Change API_URL after deployment
+//  CONFIG
 // ─────────────────────────────────────────────────────
-const API_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:5000/api'
-  : '/api'; // Same domain when deployed
+const API_URL = window.location.origin + '/api';
 
-let token = localStorage.getItem('mb_admin_token');
+let token = null;
 let currentPage = 1;
 let totalPages = 1;
 let allEnquiries = [];
 
 // ─── INIT ─────────────────────────────────────────────
-window.onload = () => {
-  if (token) showDashboard();
-  else showLogin();
+window.onload = async () => {
+  const saved = localStorage.getItem('mb_admin_token');
+  if (saved) {
+    token = saved;
+    try {
+      const res = await fetch(API_URL + '/auth/me', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('adminName').textContent = data.data.name;
+        showDashboard();
+        return;
+      }
+    } catch(e) {}
+    localStorage.removeItem('mb_admin_token');
+    token = null;
+  }
+  showLogin();
 };
 
 function showLogin() {
