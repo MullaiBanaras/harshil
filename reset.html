@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Reset Admin — Mullai Banaras</title>
+<style>
+  body { font-family: sans-serif; background: #1B2A4A; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+  .box { background: white; padding: 40px; border-radius: 20px; max-width: 400px; width: 100%; text-align: center; }
+  h1 { color: #1B2A4A; margin-bottom: 8px; }
+  p { color: #666; font-size: 14px; margin-bottom: 24px; }
+  button { background: #1B2A4A; color: white; border: none; padding: 14px 32px; border-radius: 999px; font-size: 16px; cursor: pointer; width: 100%; }
+  button:hover { opacity: 0.9; }
+  .result { margin-top: 20px; padding: 14px; border-radius: 12px; font-size: 14px; display: none; }
+  .success { background: #ECFDF5; color: #065F46; }
+  .error { background: #FEE2E2; color: #B91C1C; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Mullai Banaras</h1>
+  <p>Click the button below to create/reset your admin account</p>
+  <button onclick="doSetup()">Create Admin Account</button>
+  <div id="result" class="result"></div>
+</div>
+<script>
+async function doSetup() {
+  const btn = document.querySelector('button');
+  btn.textContent = 'Setting up...';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/auth/setup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    const el = document.getElementById('result');
+    el.style.display = 'block';
+    if (data.success) {
+      el.className = 'result success';
+      el.innerHTML = '✅ ' + data.message + '<br><br><a href="/admin.html" style="color:#065F46; font-weight:600">→ Go to Admin Dashboard</a>';
+    } else {
+      el.className = 'result error';
+      el.textContent = data.message;
+      if (data.message.includes('already')) {
+        el.innerHTML = '⚠️ Admin already exists. <br><br><a href="/admin.html" style="color:#B91C1C; font-weight:600">→ Go to Login</a>';
+      }
+    }
+  } catch(e) {
+    const el = document.getElementById('result');
+    el.style.display = 'block';
+    el.className = 'result error';
+    el.textContent = 'Error: ' + e.message;
+  }
+  btn.textContent = 'Create Admin Account';
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
